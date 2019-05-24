@@ -1,11 +1,12 @@
 import datetime
+
 from django.test import TestCase
 
 from api.models import Event, Question, Image
 
 EVENT_DATA = {
     'location': 'Nairobi',
-    'topic': 'AWS',
+    'title': 'AWS',
     'happening_on': datetime.date(2019, 6, 5)
 }
 
@@ -23,7 +24,7 @@ class EventModelTests(TestCase):
         now = datetime.datetime.utcnow()
         all_events = Event.objects.all()
         self.assertEqual(all_events.count(), 1)
-        saved_event = Event.objects.get(topic=EVENT_DATA['topic'])
+        saved_event = Event.objects.get(title=EVENT_DATA['title'])
         self.assertEqual(
             (now.minute, now.second),
             (saved_event.created_at.minute, saved_event.created_at.second))

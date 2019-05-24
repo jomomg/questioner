@@ -6,7 +6,7 @@ from django.db import models
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     location = models.CharField(max_length=60)
-    topic = models.CharField(max_length=300)
+    title = models.CharField(max_length=300)
     happening_on = models.DateField()
     created_at = models.DateTimeField(default=datetime.datetime.utcnow)
 
