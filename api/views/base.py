@@ -3,8 +3,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import EventSerializer, QuestionSerializer
-from api.models import Event, Question
 from utils.response import wrap_response
 
 
@@ -37,7 +35,7 @@ class ListViewBase(APIView):
 class DetailViewBase(APIView):
     serializer_class = None
     model = None
-    
+
     def get(self, request, pk):
         try:
             event = self.model.objects.get(pk=pk)
@@ -52,24 +50,3 @@ class DetailViewBase(APIView):
             response = wrap_response(f'{self.model.__name__} retrieved',
                                      data=serializer.data)
             return Response(response, status.HTTP_200_OK)
-
-
-class EventList(ListViewBase):
-    serializer_class = EventSerializer
-    model = Event
-
-
-class EventDetail(DetailViewBase):
-    serializer_class = EventSerializer
-    model = Event
-
-
-class QuestionList(ListViewBase):
-    serializer_class = QuestionSerializer
-    model = Question
-
-
-class QuestionDetail(DetailViewBase):
-    serializer_class = QuestionSerializer
-    model = Question
-
