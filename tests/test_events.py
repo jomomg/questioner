@@ -35,7 +35,7 @@ class EventTests(APITestCase):
         url = reverse('event-list')
         res = self.client.post(url, EVENT_DATA, format='json')
         event_id = res.data['data']['id']
-        url = reverse('event-detail', kwargs={'event_id': event_id})
+        url = reverse('event-detail', kwargs={'pk': event_id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['data']['id'], event_id)
