@@ -36,17 +36,42 @@ class DetailViewBase(APIView):
     serializer_class = None
     model = None
 
-    def get(self, request, pk):
+    def get_object(self, pk):
+        """
+        Helper method for retrieving saved objects and handling resultant
+        exceptions
+        """
+        error = False
         try:
-            event = self.model.objects.get(pk=pk)
+            instance = self.model.objects.get(pk=pk)
         except self.model.DoesNotExist:
+            error = True
             response = wrap_response('Not found', error=True)
-            return Response(response, status.HTTP_404_NOT_FOUND)
+            return error, Response(response, status.HTTP_404_NOT_FOUND)
         except ValidationError as err:
+            error = True
             response = wrap_response('An error occurred', data=err, error=True)
-            return Response(response, status.HTTP_400_BAD_REQUEST)
+            return error, Response(response, status.HTTP_400_BAD_REQUEST)
         else:
-            serializer = self.serializer_class(event)
-            response = wrap_response(f'{self.model.__name__} retrieved',
-                                     data=serializer.data)
-            return Response(response, status.HTTP_200_OK)
+            return error, instance
+
+    def get(self, request, pk):
+        error, ret = self.get_object(pk)
+        if error:
+            return ret
+        serializer = self.serializer_class(ret)
+        response = wrap_response(f'{self.model.__name__} retrieved',
+                                 data=serializer.data)
+        return Response(response, status.HTTP_200_OK)
+
+    def patch(self, request, pk):
+        error, ret = self.get_object(pk)
+        if error:
+            return ret
+        serializer = self.serializer_class(ret, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            resp = wrap_response(f'{self.model.__name__} updated', data=serializer.data)
+            return Response(resp, status.HTTP_200_OK)
+        resp = wrap_response('An error occurred', serializer.errors, error=True)
+        return Response(resp, status=status.HTTP_400_BAD_REQUEST)
