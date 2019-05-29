@@ -15,7 +15,6 @@ class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=120)
     body = models.CharField(max_length=300)
-    votes = models.IntegerField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=datetime.datetime.utcnow)
 

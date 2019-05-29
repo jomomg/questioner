@@ -15,20 +15,15 @@ class ListViewBase(APIView):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                wrap_response(f'{self.model.__name__} created',
-                              data=serializer.data),
-                status=status.HTTP_201_CREATED)
-        return Response(wrap_response('An error occurred',
-                                      serializer.errors, error=True),
+            return Response(wrap_response(f'{self.model.__name__} created', data=serializer.data),
+                            status=status.HTTP_201_CREATED)
+        return Response(wrap_response('An error occurred', serializer.errors, error=True),
                         status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         events = self.model.objects.all()
         serializer = self.serializer_class(events, many=True)
-        response = wrap_response(
-            f'Retrieved all {self.model.__name__.lower()}s',
-            data=serializer.data)
+        response = wrap_response(f'Retrieved all {self.model.__name__.lower()}s', data=serializer.data)
         return Response(response, status.HTTP_200_OK)
 
 
@@ -60,8 +55,7 @@ class DetailViewBase(APIView):
         if error:
             return ret
         serializer = self.serializer_class(ret)
-        response = wrap_response(f'{self.model.__name__} retrieved',
-                                 data=serializer.data)
+        response = wrap_response(f'{self.model.__name__} retrieved', data=serializer.data)
         return Response(response, status.HTTP_200_OK)
 
     def patch(self, request, pk):

@@ -13,5 +13,5 @@ class EventSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ('id', 'title', 'body', 'votes', 'event', 'created_at')
+        fields = ('id', 'title', 'body', 'event', 'created_at')
         read_only_fields = ('id', 'created_at')
