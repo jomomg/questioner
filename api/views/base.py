@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from utils.response import wrap_response
+from utils.response import success_, error_
 
 
 class ListViewBase(APIView):
@@ -15,15 +15,15 @@ class ListViewBase(APIView):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(wrap_response(f'{self.model.__name__} created', data=serializer.data),
-                            status=status.HTTP_201_CREATED)
-        return Response(wrap_response('An error occurred', serializer.errors, error=True),
+            resp = success_(f'{self.model.__name__} created', data=serializer.data)
+            return Response(resp, status=status.HTTP_201_CREATED)
+        return Response(error_('An error occurred', serializer.errors),
                         status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         events = self.model.objects.all()
         serializer = self.serializer_class(events, many=True)
-        response = wrap_response(f'Retrieved all {self.model.__name__.lower()}s', data=serializer.data)
+        response = success_(f'Retrieved all {self.model.__name__.lower()}s', data=serializer.data)
         return Response(response, status.HTTP_200_OK)
 
 
@@ -36,36 +36,36 @@ class DetailViewBase(APIView):
         Helper method for retrieving saved objects and handling resultant
         exceptions
         """
-        error = False
+        exc = False
         try:
             instance = self.model.objects.get(pk=pk)
         except self.model.DoesNotExist:
-            error = True
-            response = wrap_response('Not found', error=True)
-            return error, Response(response, status.HTTP_404_NOT_FOUND)
+            exc = True
+            response = error_('Not found')
+            return exc, Response(response, status.HTTP_404_NOT_FOUND)
         except ValidationError as err:
-            error = True
-            response = wrap_response('An error occurred', data=err, error=True)
-            return error, Response(response, status.HTTP_400_BAD_REQUEST)
+            exc = True
+            response = error_('An error occurred', data=err)
+            return exc, Response(response, status.HTTP_400_BAD_REQUEST)
         else:
-            return error, instance
+            return exc, instance
 
     def get(self, request, pk):
-        error, ret = self.get_object(pk)
-        if error:
+        err, ret = self.get_object(pk)
+        if err:
             return ret
         serializer = self.serializer_class(ret)
-        response = wrap_response(f'{self.model.__name__} retrieved', data=serializer.data)
+        response = success_(f'{self.model.__name__} retrieved', data=serializer.data)
         return Response(response, status.HTTP_200_OK)
 
     def patch(self, request, pk):
-        error, ret = self.get_object(pk)
-        if error:
+        err, ret = self.get_object(pk)
+        if err:
             return ret
         serializer = self.serializer_class(ret, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            resp = wrap_response(f'{self.model.__name__} updated', data=serializer.data)
+            resp = success_(f'{self.model.__name__} updated', data=serializer.data)
             return Response(resp, status.HTTP_200_OK)
-        resp = wrap_response('An error occurred', serializer.errors, error=True)
+        resp = error_('An error_ occurred', serializer.errors)
         return Response(resp, status=status.HTTP_400_BAD_REQUEST)
