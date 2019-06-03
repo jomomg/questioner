@@ -2,11 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-REGISTRATION_DATA = {
-    'username': 'test_user',
-    'password': 'test_pass',
-    'email': 'test@email.com'
-}
+from .fixtures import REGISTRATION_DATA
 
 
 class AuthenticationTestCase(APITestCase):

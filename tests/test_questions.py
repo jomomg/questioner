@@ -1,27 +1,12 @@
-import datetime
-
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
+from .utils import AuthenticatedBaseTestCase
 from api.models import Question, Event
+from .fixtures import EVENT_DATA, QUESTION_DATA
 
 
-QUESTION_DATA = {
-    'title': 'Which came first, chicken or egg?',
-    'body': 'Age old question that has baffled armchair philosophers for '
-            'millenia',
-    'votes': 234
-}
-
-EVENT_DATA = {
-    'title': 'Comic Con',
-    'location': 'Nairobi',
-    'happening_on': datetime.date(2019, 6, 7)
-}
-
-
-class EventTests(APITestCase):
+class EventTests(AuthenticatedBaseTestCase):
     @staticmethod
     def create_event():
         event = Event(**EVENT_DATA)

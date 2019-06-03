@@ -1,19 +1,12 @@
-import datetime
-
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
+from .utils import AuthenticatedBaseTestCase
 from api.models import Event
-
-EVENT_DATA = {
-    'title': 'Comic Con',
-    'location': 'Nairobi',
-    'happening_on': datetime.date(2019, 6, 7)
-}
+from .fixtures import EVENT_DATA
 
 
-class EventTests(APITestCase):
+class EventTests(AuthenticatedBaseTestCase):
     def test_creating_an_event_succeeds(self):
         url = reverse('event-list')
         response = self.client.post(url, EVENT_DATA, format='json')

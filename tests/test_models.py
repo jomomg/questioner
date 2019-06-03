@@ -3,18 +3,7 @@ import datetime
 from django.test import TestCase
 
 from api.models import Event, Question, Image
-
-EVENT_DATA = {
-    'location': 'Nairobi',
-    'title': 'AWS',
-    'happening_on': datetime.date(2019, 6, 5)
-}
-
-QUESTION_DATA = {
-    'title': 'how stuff works',
-    'body': 'what is this thing',
-    'votes': -32
-}
+from .fixtures import EVENT_DATA, QUESTION_DATA
 
 
 class EventModelTests(TestCase):
