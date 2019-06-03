@@ -5,5 +5,6 @@ urlpatterns = [
     path('events', event.EventList.as_view(), name='event-list'),
     path('events/<str:pk>', event.EventDetail.as_view(), name='event-detail'),
     path('questions', question.QuestionList.as_view(), name='question-list'),
-    path('questions/<str:pk>', question.QuestionDetail.as_view(), name='question-detail')
+    path('questions/<str:pk>', question.QuestionDetail.as_view(), name='question-detail'),
+    path('questions/<pk>/vote', question.VoteView.as_view(), name='vote')
 ]
