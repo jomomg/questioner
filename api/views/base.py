@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import exceptions
 
 from utils.response import success_, error_
 
@@ -36,33 +37,24 @@ class DetailViewBase(APIView):
         Helper method for retrieving saved objects and handling resultant
         exceptions
         """
-        exc = False
         try:
             instance = self.model.objects.get(pk=pk)
         except self.model.DoesNotExist:
-            exc = True
-            response = error_('Not found')
-            return exc, Response(response, status.HTTP_404_NOT_FOUND)
-        except ValidationError as err:
-            exc = True
-            response = error_('An error occurred', data=err)
-            return exc, Response(response, status.HTTP_400_BAD_REQUEST)
+            raise exceptions.NotFound('not found')
+        except ValidationError:
+            raise exceptions.ParseError('invalid primary key')
         else:
-            return exc, instance
+            return instance
 
     def get(self, request, pk):
-        err, ret = self.get_object(pk)
-        if err:
-            return ret
-        serializer = self.serializer_class(ret)
+        obj = self.get_object(pk)
+        serializer = self.serializer_class(obj)
         response = success_(f'{self.model.__name__} retrieved', data=serializer.data)
         return Response(response, status.HTTP_200_OK)
 
     def patch(self, request, pk):
-        err, ret = self.get_object(pk)
-        if err:
-            return ret
-        serializer = self.serializer_class(ret, data=request.data, partial=True)
+        obj = self.get_object(pk)
+        serializer = self.serializer_class(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             resp = success_(f'{self.model.__name__} updated', data=serializer.data)
